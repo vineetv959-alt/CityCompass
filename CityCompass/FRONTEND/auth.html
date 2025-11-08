@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - CityCompass</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 1. General Setup & Variables --- */
+        :root {
+            /* UPDATED: Colors from index.html */
+            --primary-accent: #0d9488;  /* Homepage Teal */
+            --primary-accent-dark: #0f766e;
+            --primary-accent-focus: rgba(13, 148, 136, 0.2);
+            --primary-accent-light-bg: #f0fdfa; /* Light teal bg */
+
+            --dark-navy: #0f172a;
+            --slate-gray: #475569;
+            --error-bg: #fef2f2;
+            --error-border: #ef4444;
+            --error-text: #dc2626;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            /* UPDATED: Background from index.html */
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&q=80&w=2072') no-repeat center center/cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* --- 2. Main Form Container --- */
+        .auth-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* NEW: Brand logo from index.html */
+        .auth-brand {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .auth-brand svg {
+            flex: 0 0 40px;
+            height: 40px;
+            width: 40px;
+            color: var(--primary-accent);
+        }
+        .auth-brand h1 {
+            margin: 0;
+            font-size: 1.5rem; /* 24px */
+            font-weight: 700;
+            color: var(--dark-navy);
+        }
+
+        .auth-box h2 {
+            font-size: 24px; /* Slightly smaller to accommodate logo */
+            color: var(--slate-gray); /* Changed from blue */
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-navy);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            /* UPDATED: Focus color */
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 3px var(--primary-accent-focus);
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 14px 20px;
+            /* UPDATED: Button color */
+            background: var(--primary-accent);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .submit-button:hover {
+            /* UPDATED: Button hover color */
+            background: var(--primary-accent-dark);
+            transform: translateY(-2px);
+        }
+        
+        /* --- Styles for the "Why Sign Up" box --- */
+        .why-signup {
+            margin-top: 25px;
+            padding: 20px;
+            /* UPDATED: Themed background */
+            background: var(--primary-accent-light-bg);
+            border: 1px solid rgba(13, 148, 136, 0.2);
+            border-radius: 8px;
+            text-align: left;
+        }
+        .why-signup h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: 600;
+            /* UPDATED: Title color */
+            color: var(--primary-accent-dark);
+        }
+        .why-signup ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .why-signup li {
+            color: var(--slate-gray);
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .why-signup li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* --- 3. Social Login Styles --- */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #aaa;
+            margin: 25px 0;
+            font-size: 14px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .divider:not(:empty)::before { margin-right: .25em; }
+        .divider:not(:empty)::after { margin-left: .25em; }
+        
+        .social-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .social-btn svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        
+        .google-btn {
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #e2e8f0;
+        }
+        .google-btn:hover {
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .facebook-btn {
+            background-color: #1877F2;
+            color: #fff;
+            border: 1px solid #1877F2;
+        }
+        .facebook-btn:hover {
+            background-color: #166fe5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* --- 4. Toggle Link Style --- */
+        .alt-action {
+            margin-top: 25px;
+            font-size: 15px;
+        }
+        .alt-action a {
+            /* UPDATED: Link color */
+            color: var(--primary-accent);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .alt-action a:hover {
+            text-decoration: underline;
+        }
+        
+        /* --- 5. Logic for Hiding/Showing Forms --- */
+        #signup-form { 
+            display: none; 
+        }
+        
+        /* --- 6. Error Message & Password Toggle Styles --- */
+        
+        .error-message {
+            background-color: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid var(--error-border);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: left;
+            display: none; /* Hidden by default */
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+        .password-wrapper input {
+            padding-right: 65px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            /* UPDATED: Toggle color */
+            color: var(--primary-accent);
+            font-weight: 600;
+            font-size: 14px;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* --- Animation --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="auth-box">
+        <div class="auth-brand">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+            </svg>
+            <h1>CityCompass</h1>
+        </div>
+        
+        <h2 id="form-title">Welcome Back!</h2>
+        
+        <form id="login-form" action="#" method="POST">
+            <p class="error-message" id="login-error"></p>
+
+            <div class="form-group">
+                <label for="login-email">Email Address</label>
+                <input type="email" id="login-email" name="email" placeholder="you@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="login-password" name="password" placeholder="••••••••" required>
+                    <span class="password-toggle" data-target="login-password">Show</span>
+                </div>
+            </div>
+
+            <a href="dashboard.html" target="_blank" class="submit-button">Login</a>
+            <div class="divider">OR</div>
+            <div class="social-buttons">
+                <a href="#" class="social-btn google-btn">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/><path d="M1 1h22v22H1z" fill="none"/></svg>
+                    Continue with Google
+                </a>
+                <a href="#" class="social-btn facebook-btn">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="white"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+                    Continue with Facebook
+                </a>
+            </div>
+
+            <div class="why-signup">
+                <h4>Create an account to:</h4>
+                <ul>
+                    <li>✓ Save your custom itineraries</li>
+                    <li>✓ Get personalized recommendations</li>
+                    <li>✓ Unlock exclusive local deals</li>
+                    <li>✓ Share tips with other travelers</li>
+                </ul>
+            </div>
+            
+            <p class="alt-action">Don't have an account? <a id="show-signup">Sign Up</a></p>
+        </form>
+
+        <form id="signup-form" action="#" method="POST">
+            <p class="error-message" id="signup-error"></p>
+
+            <div class="form-group">
+                <label for="signup-username">Username</label>
+                <input type="text" id="signup-username" name="username" placeholder="Choose a username" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email Address</label>
+                <input type="email" id="signup-email" name="email" placeholder="you@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="signup-password" name="password" placeholder="Minimum 8 characters" required>
+                    <span class="password-toggle" data-target="signup-password">Show</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="signup-confirm-password">Confirm Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="signup-confirm-password" name="confirm-password" placeholder="Repeat your password" required>
+                    <span class="password-toggle" data-target="signup-confirm-password">Show</span>
+                </div>
+            </div>
+
+            <a href="dashboard.html" class="submit-button">Create Account</a>
+            
+            <div classs="divider">OR</div>
+            <div class="social-buttons">
+                 <a href="#" class="social-btn google-btn">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/><path d="M1 1h22v22H1z" fill="none"/></svg>
+                    Continue with Google
+                </a>
+                <a href="#" class="social-btn facebook-btn">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="white"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+                    Continue with Facebook
+                </a>
+            </div>
+
+            <div class="why-signup">
+                <h4>Your account gets you:</h4>
+                <ul>
+                    <li>✓ Saved custom itineraries</li>
+                    <li>✓ Personalized recommendations</li>
+                    <li>✓ Exclusive local deals</li>
+                    <li>✓ A community of travelers</li>
+                </ul>
+            </div>
+
+            <p class="alt-action">Already have an account? <a id="show-login">Login</a></p>
+        </form>
+    </main>
+
+    <script>
+        // --- FORM TOGGLE SCRIPT ---
+        const formTitle = document.getElementById('form-title');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const showSignupLink = document.getElementById('show-signup');
+        const showLoginLink = document.getElementById('show-login');
+
+        showSignupLink.addEventListener('click', (event) => {
+            event.preventDefault(); 
+            loginForm.style.display = 'none';
+            signupForm.style.display = 'block';
+            formTitle.textContent = 'Create Your Account'; // Updated title
+        });
+
+        showLoginLink.addEventListener('click', (event) => {
+            event.preventDefault(); 
+            signupForm.style.display = 'none';
+            loginForm.style.display = 'block';
+            formTitle.textContent = 'Welcome Back!';
+        });
+
+        // --- PASSWORD TOGGLE SCRIPT ---
+        document.querySelectorAll('.password-toggle').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const targetId = toggle.dataset.target;
+                const targetInput = document.getElementById(targetId);
+                
+                if (targetInput.type === 'password') {
+                    targetInput.type = 'text';
+                    toggle.textContent = 'Hide';
+                } else {
+                    targetInput.type = 'password';
+                    toggle.textContent = 'Show';
+                }
+            });
+        });
+
+        // --- SCRIPT TO SHOW/HIDE ERRORS (EXAMPLE) ---
+        const loginError = document.getElementById('login-error');
+        const signupError = document.getElementById('signup-error');
+
+        function showLoginError(message) {
+            loginError.textContent = message;
+            loginError.style.display = 'block';
+        }
+
+        function showSignupError(message) {
+            signupError.textContent = message;
+            signupError.style.display = 'block';
+        }
+
+    </script>
+</body>
+</html>

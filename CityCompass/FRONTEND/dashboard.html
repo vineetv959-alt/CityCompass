@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CityCompass</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+    <style>
+        :root {
+            /* UPDATED: Theme from index.html */
+            --primary-accent: #0d9488;
+            --primary-accent-dark: #0f766e;
+            --accent-warm: #f59e0b; /* For rewards */
+            
+            --dark-navy: #0f172a;
+            --slate-gray: #475569;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&q=80&w=2072') no-repeat center center/cover;
+            background-attachment: fixed;
+            color: var(--slate-gray);
+        }
+
+        /* --- Header --- */
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+
+        /* UPDATED: Logo style */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-accent); /* UPDATED */
+            text-decoration: none;
+        }
+        .logo svg { /* NEW */
+            width: 32px;
+            height: 32px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* --- Main Dashboard Layout --- */
+        .dashboard-container {
+            padding: 40px 5%;
+        }
+
+        .dashboard-header {
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            border-radius: 16px;
+        }
+        .dashboard-header h1 {
+            font-size: 28px;
+            color: var(--dark-navy);
+        }
+        .dashboard-header p {
+            font-size: 16px;
+        }
+        .dashboard-header p svg {
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* --- Main Content (Left Column) --- */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark-navy);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .card-title svg {
+            width: 22px;
+            height: 22px;
+            margin-right: 10px;
+            color: var(--primary-accent); /* UPDATED */
+        }
+
+        /* Route Planner Styles */
+        .route-planner-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--dark-navy);
+        }
+        .form-group input {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .route-preferences {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .pref-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid #bdc7d3;
+            background: transparent;
+            color: var(--slate-gray);
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .pref-btn:hover, .pref-btn.active {
+            background: var(--primary-accent); /* UPDATED */
+            color: var(--white);
+            border-color: var(--primary-accent); /* UPDATED */
+        }
+        .submit-btn {
+            grid-column: 1 / -1;
+            padding: 14px;
+            background: var(--primary-accent); /* UPDATED */
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .submit-btn:hover { background: var(--primary-accent-dark); } /* UPDATED */
+
+        /* Other Feature Cards */
+        .community-hack {
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding: 15px 0;
+        }
+        .community-hack:last-child { border-bottom: none; padding-bottom: 0; }
+        .community-hack p { margin-bottom: 5px; color: var(--dark-navy); }
+        .community-hack span { font-size: 14px; color: var(--primary-accent); font-weight: 500; } /* UPDATED */
+
+        /* --- Sidebar (Right Column) --- */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        /* Rewards & Badges Card Styles */
+        .rewards-card .points {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-warm); /* UPDATED */
+            margin-bottom: 10px;
+        }
+        .rewards-card .points svg {
+            width: 28px;
+            height: 28px;
+            vertical-align: middle;
+        }
+        .badges-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px; 
+            text-align: center;
+        }
+        .badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: transform 0.2s ease;
+        }
+        .badge:hover {
+            transform: scale(1.1);
+        }
+        
+        /* REMOVED .badge img */
+        
+        .badge span {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--dark-navy);
+        }
+        .badge.locked {
+            filter: grayscale(100%);
+            opacity: 0.5;
+        }
+        .badge.locked:hover {
+            transform: none;
+        }
+        
+        /* --- NEW Badge Icon Styles --- */
+        .badge-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            background: #f1f5f9; /* Default background */
+            color: var(--dark-navy); /* Default color */
+        }
+        .badge-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+        .badge.locked .badge-icon {
+            background: #e2e8f0;
+            color: var(--slate-gray);
+        }
+        /* --- END NEW Badge Styles --- */
+        
+        /* Recent Activity Styles */
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+         .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .activity-icon {
+            padding: 10px;
+            background: rgba(226, 232, 240, 0.7);
+            border-radius: 50%;
+            color: var(--primary-accent); /* UPDATED */
+        }
+
+        #map {
+            width: 100%;
+            height: 400px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .route-planner-form {
+                grid-template-columns: 1fr;
+            }
+            .route-preferences {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="homepage.html" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+            </svg>
+            <span>CityCompass</span>
+        </a>
+        <div class="user-profile">
+            <i data-feather="bell"></i>
+            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1961&auto=format&fit=crop" alt="User Avatar">
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Good Morning, Priya!</h1>
+            <p><i data-feather="map-pin"></i>Your current location: <span id="location-text">Greater Noida, Uttar Pradesh</span></p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="main-content">
+                <div class="card">
+                    <h2 class="card-title"><i data-feather="navigation"></i>Plan Your Next Journey</h2>
+                    <form class="route-planner-form">
+                        <div class="form-group">
+                            <label for="from">From</label>
+                            <input type="text" id="from" placeholder="Enter starting point">
+                        </div>
+                        <div class="form-group">
+                            <label for="to">To</label>
+                            <input type="text" id="to" placeholder="Enter destination">
+                        </div>
+                        <div class="route-preferences">
+                            <button type="button" class="pref-btn active">Cheapest</button>
+                            <button type="button" class="pref-btn">Fastest</button>
+                            <button type="button" class="pref-btn">Eco-Friendly</button>
+                            <button type="button" class="pref-btn">Less Walking</button>
+                        </div>
+                        <button type="submit" class="submit-btn">Find Route & Compare Fares</button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title"><i data-feather="users"></i>Community Travel Hacks</h2>
+                    <div class="community-hack">
+                        <p>"Take the Metro from Sector 52 to Pari Chowk and then a shared auto. Saves at least ₹100 compared to a cab!"</p>
+                        <span>- Ankit S.</span>
+                    </div>
+                    <div class="community-hack">
+                        <p>"The food court near Jagat Farm has the best budget-friendly lunch options if you're exploring that area."</p>
+                        <span>- Neha V.</span>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <div id="map"></div>
+                </div>
+            </div>
+
+            <aside class="sidebar">
+                <div class="card rewards-card">
+                    <h2 class="card-title"><i data-feather="award"></i>My Badges & Rewards</h2>
+                    
+                    <div class="badges-container">
+                        <div class="badge" id="badge-foodie" title="Foodie Pro: Reviewed 5 restaurants">
+                            <div class="badge-icon" style="color: #c026d3; background: #faf5ff;">
+                                <i data-feather="gift"></i>
+                            </div>
+                            <span>Foodie Pro</span>
+                        </div>
+                        <div class="badge" id="badge-history" title="History Buff: Visited 3 historical sites">
+                            <div class="badge-icon" style="color: #ca8a04; background: #fefce8;">
+                                <i data-feather="book-open"></i>
+                            </div>
+                            <span>History Buff</span>
+                        </div>
+                        <div class="badge" id="badge-metro" title="Metro Master: Planned 10 metro routes">
+                            <div class="badge-icon" style="color: #0284c7; background: #f0f9ff;">
+                                <i data-feather="truck"></i>
+                            </div>
+                            <span>Metro Master</span>
+                        </div>
+                        <div class="badge" id="badge-market" title="Market Explorer: Visited 2 local markets">
+                            <div class="badge-icon" style="color: #dc2626; background: #fef2f2;">
+                                <i data-feather="shopping-cart"></i>
+                            </div>
+                            <span>Market Explorer</span>
+                        </div>
+                        <div class="badge" id="badge-park" title="Park Wanderer: Visited 3 parks">
+                            <div class="badge-icon" style="color: #16a34a; background: #f0fdf4;">
+                                <i data-feather="sun"></i>
+                            </div>
+                            <span>Park Wanderer</span>
+                        </div>
+                    </div>
+                
+                    <div class="points" style="margin-top: 20px; font-size: 24px;">
+                        <i data-feather="leaf"></i> 1,250 
+                        <span style="font-size: 14px; color: var(--slate-gray); font-weight: 500;">Green Points</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title"><i data-feather="clock"></i>Recent Activity</h2>
+                    <div class="activity-item">
+                        <div class="activity-icon"><i data-feather="map"></i></div>
+                        <div>
+                            <strong>Route to Sector 18</strong>
+                            <p>Saved Yesterday</p>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon"><i data-feather="star"></i></div>
+                        <div>
+                            <strong>Saved: The Belgian Cafe</strong>
+                            <p>Jagat Farm</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <script>
+        feather.replace();
+    </script>
+    <script>
+        // Get the element where we will display the location
+        const locationElement = document.getElementById("location-text");
+
+        // This function will be called when the page loads
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                locationElement.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        // This function is called if the user allows location access
+        async function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            locationElement.innerHTML = "Fetching address...";
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+                const data = await response.json();
+                const city = data.address.city || data.address.town || data.address.village;
+                const state = data.address.state;
+                if (city && state) {
+                    locationElement.innerHTML = `${city}, ${state}`;
+                } else {
+                    locationElement.innerHTML = "Address not found.";
+                }
+            } catch (error) {
+                locationElement.innerHTML = "Could not fetch address.";
+            }
+        }
+
+        // This function is called if there's an error
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    locationElement.innerHTML = "Location access denied."
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    locationElement.innerHTML = "Location information is unavailable."
+                    break;
+                case error.TIMEOUT:
+                    locationElement.innerHTML = "The request to get user location timed out."
+                    break;
+                case error.UNKNOWN_ERROR:
+                    locationElement.innerHTML = "An unknown error occurred."
+                    break;
+            }
+        }
+        window.onload = getUserLocation;
+    </script>
+    <script>
+        // --- Mapbox Animation ---
+        mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN'; // IMPORTANT: REPLACE WITH YOUR TOKEN
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v12',
+            center: [77.3910, 28.5355],
+            zoom: 12
+        });
+
+        // Add map controls
+        map.addControl(new mapboxgl.NavigationControl());
+
+        const start = [77.3219, 28.5833];
+        const end = [77.5042, 28.4744];
+
+        async function getRouteAndAnimate() {
+            // Check if token is default
+            if (mapboxgl.accessToken.includes('YOUR_MAPBOX_ACCESS_TOKEN')) {
+                console.error("Mapbox token not set. Please replace 'YOUR_MAPBOX_ACCESS_TOKEN'.");
+                // Optionally, hide the map or show a message
+                document.getElementById('map').innerHTML = '<div style="padding: 20px; text-align: center;">Please set Mapbox token to see map.</div>';
+                return;
+            }
+
+            const response = await fetch(
+                `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`
+            );
+            const data = await response.json();
+            const route = data.routes[0].geometry.coordinates;
+
+            const routeGeoJSON = {
+                type: 'Feature',
+                properties: {},
+                geometry: { type: 'LineString', coordinates: route }
+            };
+
+            map.on('load', () => {
+                map.addSource('route', { type: 'geojson', data: routeGeoJSON });
+                map.addLayer({
+                    id: 'route',
+                    type: 'line',
+                    source: 'route',
+                    layout: { 'line-join': 'round', 'line-cap': 'round' },
+                    paint: { 'line-color': '#888', 'line-width': 5, 'line-opacity': 0.75 } // Base route color
+                });
+
+                let step = 0;
+                const animationSteps = 300;
+                const animatedRoute = {
+                     type: 'Feature',
+                     geometry: { type: 'LineString', coordinates: [] }
+                };
+                
+                map.addSource('animated-route', { type: 'geojson', data: animatedRoute });
+                map.addLayer({
+                    id: 'animated-route',
+                    type: 'line',
+                    source: 'animated-route',
+                    paint: { 'line-color': 'var(--primary-accent)', 'line-width': 6 } // Animated line color
+                });
+
+                function animate() {
+                    if (step <= animationSteps) {
+                        const progress = route.slice(0, Math.floor(route.length * step / animationSteps));
+                        animatedRoute.geometry.coordinates = progress;
+                        map.getSource('animated-route').setData(animatedRoute);
+                        step++;
+                        requestAnimationFrame(animate);
+                    }
+                }
+                animate();
+            });
+        }
+        getRouteAndAnimate();
+    </script>
+    <script>
+        // --- Badge Awarding Simulation ---
+        // This object simulates which badges the user has earned
+        const userBadges = {
+            foodie: true,
+            history: true,
+            metro: true,
+            market: false, // This user hasn't earned 'Market Explorer'
+            park: true
+        };
+
+        function displayUserBadges() {
+            if (!userBadges.foodie) {
+                document.getElementById('badge-foodie').classList.add('locked');
+            }
+            if (!userBadges.history) {
+                document.getElementById('badge-history').classList.add('locked');
+            }
+            if (!userBadges.metro) {
+                document.getElementById('badge-metro').classList.add('locked');
+            }
+            if (!userBadges.market) {
+                document.getElementById('badge-market').classList.add('locked');
+            }
+            if (!userBadges.park) {
+                document.getElementById('badge-park').classList.add('locked');
+            }
+        }
+        // Run the badge check when the document is ready
+        document.addEventListener('DOMContentLoaded', displayUserBadges);
+    </script>
+</body>
+</html>
